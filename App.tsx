@@ -35,6 +35,7 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
+import { useExpoNotification } from "./src/hooks/useRegisterForNotifications";
 
 // Create a client
 const queryClient = new QueryClient();

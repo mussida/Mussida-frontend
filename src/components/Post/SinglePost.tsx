@@ -1,20 +1,29 @@
+import { FontAwesome5 } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
+import { Audio } from "expo-av";
+import React, { useEffect, useState } from "react";
 import { Image, View } from "react-native";
-import { Avatar, Button, Card, Chip, Text } from "react-native-paper";
 import {
-	QueryPostsRouterCreateNormalPost200Response,
-	QueryPostsRouterGetRecommendedPost200ResponseInner,
-} from "spotifyApp-api-main-manager";
-import { getRecommendPostsQueryKey } from "./Hooks/useGetRecommendedPosts";
-import { spotifyApi } from "../../utils/spotifyClients";
+	Avatar,
+	Card,
+	Chip,
+	Text,
+	TouchableRipple,
+	useTheme,
+} from "react-native-paper";
+import { QueryPostsRouterGetRecommendedPost200ResponseInner } from "spotifyApp-api-main-manager";
 import { fontVariant } from "../../utils/fonts/fontVariant";
+import { spotifyApi } from "../../utils/spotifyClients";
+import { getRecommendPostsQueryKey } from "./Hooks/useGetRecommendedPosts";
 
 export default function SinglePost({
 	post,
 }: {
 	post: QueryPostsRouterGetRecommendedPost200ResponseInner;
 }) {
+	const theme = useTheme();
+	const [audio, setAudio] = useState<Audio.SoundObject>();
+	const [isPlaying, setIsPlaying] = useState(false);
 	const { data: track, isLoading: isLoadingTrack } = useQuery({
 		queryKey: [...getRecommendPostsQueryKey, "track", post.songId],
 		queryFn: async () => {
@@ -30,6 +39,15 @@ export default function SinglePost({
 	});
 
 	const isLoading = isLoadingTrack || isLoadingCreator;
+
+	useEffect(() => {
+		if (!track) return;
+		Audio.Sound.createAsync({
+			uri: track.body.preview_url ?? "",
+		}).then((audio) => {
+			setAudio(audio);
+		});
+	}, [track]);
 
 	if (isLoading) {
 		return (
@@ -85,18 +103,60 @@ export default function SinglePost({
 					);
 				})}
 			</View>
-			<Image
+			<View
 				style={{
 					width: "100%",
-					// height: 200,
+					position: "relative",
 					marginTop: 12,
-					borderRadius: 8,
-					aspectRatio: 1,
+					alignItems: "center",
+					justifyContent: "center",
 				}}
-				source={{
-					uri: track?.body.album.images[0]?.url ?? "",
-				}}
-			/>
+			>
+				<Image
+					style={{
+						width: "100%",
+						borderRadius: 8,
+						aspectRatio: 1,
+					}}
+					source={{
+						uri: track?.body.album.images[0]?.url ?? "",
+					}}
+				/>
+				{audio && (
+					<TouchableRipple
+						onPress={async () => {
+							setIsPlaying(!isPlaying);
+							console.log(audio);
+							if (isPlaying) {
+								audio?.sound.pauseAsync();
+							} else {
+								audio?.sound.playAsync().then((res) => {
+									console.log(res);
+								});
+							}
+							audio?.sound.getStatusAsync().then((status) => {
+								// console.log("SIUM:  ~ status:", status)
+							});
+						}}
+						underlayColor={theme.colors.primary}
+						style={{
+							position: "absolute",
+							shadowRadius: 12,
+							shadowOpacity: 0.8,
+						}}
+					>
+						{!isPlaying ? (
+							<FontAwesome5 name="play" size={40} color="white" />
+						) : (
+							<FontAwesome5
+								name="pause"
+								size={40}
+								color="white"
+							/>
+						)}
+					</TouchableRipple>
+				)}
+			</View>
 		</Card>
 	);
 }

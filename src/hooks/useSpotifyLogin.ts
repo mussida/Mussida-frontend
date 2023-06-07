@@ -21,10 +21,10 @@ const discovery = {
 const clientId = "ff78f4e3584f4448a5385fe2f72e20cf";
 
 export function useSpotifyLogin() {
-  const [token, setToken] = useAtom(spotifyTokenAtom);
+	const [token, setToken] = useAtom(spotifyTokenAtom);
   const [backendToken, setBackendToken] = useAtom(backendTokenAtom);
 
-  const usersApi = useApi(UsersApi);
+	const usersApi = useApi(UsersApi);
 
   const login = async () => {
     try {
@@ -39,7 +39,8 @@ export function useSpotifyLogin() {
         scopes: [
           "user-read-email",
           "playlist-modify-public",
-          "user-read-private",
+          "user-modify-playback-state",
+          "streaming",
         ],
         redirectUri: redirectUrl,
         state: state,
@@ -63,7 +64,7 @@ export function useSpotifyLogin() {
         },
         discovery
       );
-      console.log(accessToken, "access token");
+
       spotifyApi.setAccessToken(accessToken);
       setToken(accessToken);
       if (refreshToken) spotifyApi.setRefreshToken(refreshToken);
@@ -72,7 +73,6 @@ export function useSpotifyLogin() {
           spotifyToken: accessToken,
         })
         .then((res) => {
-          console.log(res, "res");
           setBackendToken(res.data.token);
         })
         .catch((err) => {
@@ -82,5 +82,6 @@ export function useSpotifyLogin() {
       console.log(err);
     }
   };
-  return { login };
+
+	return { login };
 }

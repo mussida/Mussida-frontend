@@ -53,6 +53,7 @@ const AddArtistBottomSheet = forwardRef<BottomSheetMethods, {}>(
 			//rifetchamo cosi se error ci toglie elemento dalla lista
 			onSettled: () => {
 				queryClient.invalidateQueries(top10ArtistQueryKey);
+				queryClient.invalidateQueries(["profile"]);
 			},
 			onError: (error) => {
 				Toast.show({

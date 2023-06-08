@@ -94,6 +94,7 @@ export default function Top10Songs() {
 			}}
 			revalidateItems={function (): void {
 				queryClient.invalidateQueries(["profile", "top10Songs"]);
+				queryClient.invalidateQueries(["profile"]);
 			}}
 		/>
 	);

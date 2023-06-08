@@ -1,7 +1,7 @@
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import { View } from "react-native";
+import { Keyboard, Pressable, TouchableOpacity, View } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 import {
 	PostsApi,
@@ -78,16 +78,22 @@ export default function NormalPost() {
 	return (
 		<>
 			<View style={{ padding: 20 }}>
-				<TextInput
-					onPressIn={() => {
+				<Pressable
+					onPress={() => {
 						bottomSheetRef.current?.present();
 					}}
-					mode="outlined"
-					value={song?.name || ""}
-					editable={false}
-					placeholder="select a song"
-					multiline
-				/>
+				>
+					<TextInput
+						onPressIn={() => {
+							bottomSheetRef.current?.present();
+						}}
+						mode="outlined"
+						value={song?.name || ""}
+						editable={false}
+						placeholder="select a song"
+						multiline
+					/>
+				</Pressable>
 				<TextInput
 					mode="outlined"
 					placeholder="type a caption"
@@ -96,10 +102,12 @@ export default function NormalPost() {
 					onChangeText={(text) => {
 						setCaption(text);
 					}}
+					onEndEditing={() => {
+						console.log("end");
+					}}
 					value={caption}
 					style={{ marginTop: 16 }}
 				/>
-
 				<PickListItemBottomSheet
 					ref={bottomSheetRef}
 					selectedItems={[]}
@@ -130,16 +138,18 @@ export default function NormalPost() {
 					}}
 				></PickListItemBottomSheet>
 			</View>
-			<Button
-				loading={publishPost.isLoading}
-				mode="contained"
-				style={{ width: "100%", marginBottom: 16 }}
-				onPress={() => {
-					publishPost.mutate();
-				}}
-			>
-				Publish
-			</Button>
+			<View style={{ padding: 12 }}>
+				<Button
+					loading={publishPost.isLoading}
+					mode="contained"
+					style={{ width: "100%", marginBottom: 16 }}
+					onPress={() => {
+						publishPost.mutate();
+					}}
+				>
+					Publish
+				</Button>
+			</View>
 		</>
 	);
 }

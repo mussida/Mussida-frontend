@@ -1,6 +1,9 @@
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import * as React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+	SafeAreaView,
+	useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { FAB, Portal } from "react-native-paper";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,12 +17,17 @@ import LoadingScreen from "../../components/Loadings/LoadingScreen/LoadingScreen
 import SinglePost from "../../components/Post/SinglePost";
 import { FlatList } from "react-native-gesture-handler";
 import { useQueryClient } from "@tanstack/react-query";
+import { useExpoNotification } from "../../hooks/useRegisterForNotifications";
 
 export default function Home() {
+	const { bottom } = useSafeAreaInsets();
+
 	const queryClient = useQueryClient();
 	const navigation = useNavigation();
 	const [open, setOpen] = React.useState(false);
 	const { data, isLoading, isFetching } = useGetRecommendedPosts();
+
+	useExpoNotification();
 
 	if (isLoading) {
 		return <LoadingScreen />;
@@ -47,7 +55,11 @@ export default function Home() {
 			<FAB.Group
 				open={open}
 				visible
-				style={{ position: "absolute", bottom: -35, right: 0 }}
+				style={{
+					position: "absolute",
+					bottom: Platform.OS === "android" ? bottom : -35,
+					right: 0,
+				}}
 				icon={(iconProps) => {
 					return open ? (
 						<MaterialCommunityIcons name={"home"} {...iconProps} />
@@ -55,7 +67,7 @@ export default function Home() {
 						<AntDesign name="plus" {...iconProps} />
 					);
 				}}
-				backdropColor="transparent"
+				// backdropColor="transparent"
 				actions={[
 					{
 						icon: (iconProps) => {
@@ -68,22 +80,22 @@ export default function Home() {
 							// @ts-ignore
 							navigation.navigate("CreatePost", { type: "song" }),
 					},
-					{
-						icon: (iconProps) => {
-							return (
-								<MaterialIcons
-									name="event-available"
-									{...iconProps}
-								/>
-							);
-						},
-						label: "Event",
-						onPress: () =>
-							// @ts-ignore
-							navigation.navigate("CreatePost", {
-								type: "event",
-							}),
-					},
+					// {
+					// 	icon: (iconProps) => {
+					// 		return (
+					// 			<MaterialIcons
+					// 				name="event-available"
+					// 				{...iconProps}
+					// 			/>
+					// 		);
+					// 	},
+					// 	label: "Event",
+					// 	onPress: () =>
+					// 		// @ts-ignore
+					// 		navigation.navigate("CreatePost", {
+					// 			type: "event",
+					// 		}),
+					// },
 				]}
 				onStateChange={() => {
 					setOpen((prev) => {

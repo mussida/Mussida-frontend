@@ -1,9 +1,11 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import { Audio } from "expo-av";
-import React, { useEffect, useState } from "react";
-import { Image, View } from "react-native";
+import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
+import { useAtom } from "jotai";
+import React from "react";
+import { Image, Platform, View } from "react-native";
 import {
+	ActivityIndicator,
 	Avatar,
 	Card,
 	Chip,
@@ -15,6 +17,7 @@ import { QueryPostsRouterGetRecommendedPost200ResponseInner } from "spotifyApp-a
 import { fontVariant } from "../../utils/fonts/fontVariant";
 import { spotifyApi } from "../../utils/spotifyClients";
 import { getRecommendPostsQueryKey } from "./Hooks/useGetRecommendedPosts";
+import { audioAtom } from "./atoms/audioAtom";
 
 export default function SinglePost({
 	post,
@@ -22,8 +25,8 @@ export default function SinglePost({
 	post: QueryPostsRouterGetRecommendedPost200ResponseInner;
 }) {
 	const theme = useTheme();
-	const [audio, setAudio] = useState<Audio.SoundObject>();
-	const [isPlaying, setIsPlaying] = useState(false);
+	const [audio, setAudio] = useAtom(audioAtom);
+
 	const { data: track, isLoading: isLoadingTrack } = useQuery({
 		queryKey: [...getRecommendPostsQueryKey, "track", post.songId],
 		queryFn: async () => {
@@ -39,15 +42,6 @@ export default function SinglePost({
 	});
 
 	const isLoading = isLoadingTrack || isLoadingCreator;
-
-	useEffect(() => {
-		if (!track) return;
-		Audio.Sound.createAsync({
-			uri: track.body.preview_url ?? "",
-		}).then((audio) => {
-			setAudio(audio);
-		});
-	}, [track]);
 
 	if (isLoading) {
 		return (
@@ -122,40 +116,97 @@ export default function SinglePost({
 						uri: track?.body.album.images[0]?.url ?? "",
 					}}
 				/>
-				{audio && (
-					<TouchableRipple
-						onPress={async () => {
-							setIsPlaying(!isPlaying);
-							console.log(audio);
-							if (isPlaying) {
-								audio?.sound.pauseAsync();
-							} else {
-								audio?.sound.playAsync().then((res) => {
-									console.log(res);
+				<TouchableRipple
+					onPress={async () => {
+						if (!audio?.audio) {
+							const newAudio = await Audio.Sound.createAsync({
+								uri: track?.body.preview_url ?? "",
+							});
+							setAudio({ postId: post.id, audio: newAudio });
+							if (Platform.OS === "ios") {
+								await Audio.setAudioModeAsync({
+									staysActiveInBackground: true,
+									shouldDuckAndroid: false,
+									playThroughEarpieceAndroid: false,
+									allowsRecordingIOS: false,
+									interruptionModeAndroid:
+										InterruptionModeAndroid.DoNotMix,
+									interruptionModeIOS:
+										InterruptionModeIOS.DoNotMix,
+									playsInSilentModeIOS: true,
 								});
 							}
-							audio?.sound.getStatusAsync().then((status) => {
-								// console.log("SIUM:  ~ status:", status)
-							});
-						}}
-						underlayColor={theme.colors.primary}
-						style={{
-							position: "absolute",
-							shadowRadius: 12,
-							shadowOpacity: 0.8,
-						}}
-					>
-						{!isPlaying ? (
-							<FontAwesome5 name="play" size={40} color="white" />
-						) : (
-							<FontAwesome5
-								name="pause"
-								size={40}
-								color="white"
-							/>
-						)}
-					</TouchableRipple>
-				)}
+							newAudio.sound.playAsync();
+							newAudio.sound.setProgressUpdateIntervalAsync(1000);
+							newAudio.sound.setOnPlaybackStatusUpdate(
+								(status) => {
+									if (
+										status.isLoaded &&
+										(status.durationMillis ?? 0) -
+											status.positionMillis <=
+											1000
+									) {
+										newAudio.sound.stopAsync();
+										newAudio.sound.setPositionAsync(0);
+										setAudio((prev) => ({
+											...prev,
+											isPlaying: false,
+										}));
+									}
+								}
+							);
+							setAudio((prev) => ({
+								...prev,
+								isPlaying: true,
+							}));
+						} else {
+							if (audio.postId !== post.id) {
+								setAudio((prev) => ({
+									...prev,
+									postId: post.id,
+								}));
+								await audio?.audio.sound.unloadAsync();
+								await audio.audio.sound.loadAsync({
+									uri: track?.body.preview_url ?? "",
+								});
+								audio.audio?.sound.playAsync();
+								setAudio((prev) => ({
+									...prev,
+									isPlaying: true,
+								}));
+							} else {
+								if (audio.isPlaying) {
+									audio?.audio.sound.pauseAsync();
+									setAudio((prev) => ({
+										...prev,
+										isPlaying: false,
+									}));
+								} else {
+									audio?.audio.sound.playAsync();
+									setAudio((prev) => ({
+										...prev,
+										isPlaying: true,
+									}));
+								}
+							}
+						}
+					}}
+					underlayColor={theme.colors.primary}
+					style={{
+						position: "absolute",
+						shadowRadius: 12,
+						shadowOpacity: 0.8,
+					}}
+				>
+					{audio?.postId === post.id &&
+					audio.audio?.sound._loading ? (
+						<ActivityIndicator size="large" />
+					) : !audio?.isPlaying || audio.postId !== post.id ? (
+						<FontAwesome5 name="play" size={40} color="white" />
+					) : (
+						<FontAwesome5 name="pause" size={40} color="white" />
+					)}
+				</TouchableRipple>
 			</View>
 		</Card>
 	);

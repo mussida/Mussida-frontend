@@ -16,4 +16,4 @@ l’utente mandi il proprio nome e email di **Spotify** all’indirizzo
 email del sottoscritto e gli verrà concessa l’autorizzazione. Infine, l’utlima
 richiesta da allegare per la prova è l’indirizzo di **Expo** sul quale si trova
 l’applicazione dopo il comando `npm start`, che verrà mostrata in console
-(es. exp://192.168.1.51:19000*).
+(es. *exp://192.168.1.51:19000*).

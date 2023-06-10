@@ -12,7 +12,7 @@ import {
 	useFonts,
 } from "@expo-google-fonts/nunito-sans";
 import * as React from "react";
-import { StatusBar, StyleSheet } from "react-native";
+import { LogBox, StatusBar, StyleSheet } from "react-native";
 import { MD3DarkTheme, Provider, configureFonts } from "react-native-paper";
 
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
@@ -26,6 +26,8 @@ import { spotifyTokenAtom } from "./src/utils/atoms/tokenAtoms";
 import Top10Artists from "./src/pages/Profile/Pages/top10artists/Top10Artists";
 import Top10Songs from "./src/pages/Profile/Pages/top10Songs/Top10Songs";
 import Top5Playlists from "./src/pages/Profile/Pages/top5Playlists/Top5Playlist";
+
+LogBox.ignoreAllLogs();
 
 // Create a client
 const queryClient = new QueryClient();

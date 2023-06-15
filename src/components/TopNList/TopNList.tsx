@@ -11,6 +11,7 @@ import { Response } from "../../utils/interfaces/Response";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 
 type TopNListProps<
+	//la fetch deve restituire una cosa che come minimo deve avere queste proprietà
 	T extends { images: SpotifyApi.ImageObject[]; name: string }
 > = {
 	data: string[];

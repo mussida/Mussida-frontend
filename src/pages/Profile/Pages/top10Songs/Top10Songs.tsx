@@ -22,6 +22,7 @@ export default function Top10Songs() {
 			data={top10Songs?.data ?? []}
 			isLoadingData={isLoadingTop10Songs}
 			entityName="song"
+			//specifico il modo in cui ottenere i dati da renderizzare.
 			extractItems={(data) => {
 				return (
 					data?.tracks?.items.map((item) => {
@@ -34,6 +35,7 @@ export default function Top10Songs() {
 				);
 			}}
 			maxLenght={10}
+			//fetch da spotify per renderizzare propri preferiti
 			fetchItem={function (
 				id: string
 			): Promise<{ images: SpotifyApi.ImageObject[]; name: string }> {
@@ -65,11 +67,13 @@ export default function Top10Songs() {
 					}
 				);
 			}}
+			//fa la ricerca da spotify mentre scrivo
 			searchEntity={function (
 				searchInput: string
 			): Promise<Response<SpotifyApi.SearchResponse>> {
 				return spotifyApi.searchTracks(searchInput);
 			}}
+			//click di aggiunta
 			onAddItem={function (item: {
 				name: string;
 				images: SpotifyApi.ImageObject[];
@@ -79,6 +83,7 @@ export default function Top10Songs() {
 					top10Songs: [...(top10Songs?.data ?? []), item.id],
 				});
 			}}
+			//modifica direttamente il dato in cache della fetch sul nostro profilo
 			onOptimisticAddItem={function (item: {
 				name: string;
 				images: SpotifyApi.ImageObject[];

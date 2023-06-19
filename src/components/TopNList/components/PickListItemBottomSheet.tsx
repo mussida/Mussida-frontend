@@ -147,7 +147,7 @@ const PickListItemBottomSheet = forwardRef<BottomSheetModalMethods, Props>(
 								>
 									<View
 										style={{
-											padding: 12,
+											padding: 12,  
 											flexDirection: "row",
 											alignItems: "center",
 										}}

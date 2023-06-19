@@ -36,7 +36,7 @@ export default function Home() {
 		<View
 			style={{
 				height: "100%",
-				position: "relative",
+				position: "relative", 
 			}}
 		>
 			<FlatList

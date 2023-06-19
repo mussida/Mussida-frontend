@@ -19,6 +19,13 @@ import { spotifyApi } from "../../utils/spotifyClients";
 import { getRecommendPostsQueryKey } from "./Hooks/useGetRecommendedPosts";
 import { audioAtom } from "./atoms/audioAtom";
 
+
+// Il player funziona che quando premi play se non hai mai premuto play allora crea un istanza 
+// della classe Audio passandogli l'url della traccia. Una volta creata l'istanza fa play. 
+// Quando invece fai play su un altra canzone, invece di ricreare l'audio, semplicemente gli 
+// carica un altra traccia dato l'url
+
+
 export default function SinglePost({
 	post,
 }: {
@@ -118,6 +125,7 @@ export default function SinglePost({
 				/>
 				<TouchableRipple
 					onPress={async () => {
+						//STARTING FIRST PLAYER
 						if (!audio?.audio) {
 							const newAudio = await Audio.Sound.createAsync({
 								uri: track?.body.preview_url ?? "",
@@ -160,6 +168,7 @@ export default function SinglePost({
 								isPlaying: true,
 							}));
 						} else {
+							//PAUSE RUNNING SONG AND START NEW ONE
 							if (audio.postId !== post.id) {
 								setAudio((prev) => ({
 									...prev,
@@ -175,6 +184,7 @@ export default function SinglePost({
 									isPlaying: true,
 								}));
 							} else {
+								//PAUSE 
 								if (audio.isPlaying) {
 									audio?.audio.sound.pauseAsync();
 									setAudio((prev) => ({
@@ -182,6 +192,7 @@ export default function SinglePost({
 										isPlaying: false,
 									}));
 								} else {
+									//PLAY
 									audio?.audio.sound.playAsync();
 									setAudio((prev) => ({
 										...prev,

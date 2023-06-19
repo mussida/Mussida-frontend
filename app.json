@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "spotifyApp",
+    "name": "mussida",
     "slug": "spotifyApp",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -20,7 +20,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mussida.spotifyApp"
+      "bundleIdentifier": "com.mussida.app"
     },
     "android": {
       "adaptiveIcon": {

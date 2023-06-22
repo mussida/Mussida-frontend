@@ -21,13 +21,13 @@ export function useApi<T>(apiConstructor: T) {
 }
 
 export function instanceApi<T>(apiConstructor: T, token: string) {
-  return new apiConstructor({
-    basePath: `${BACKEND_API_BASENAME}/api`,
-    baseOptions: {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  });
+	return new apiConstructor({
+		basePath: `${BACKEND_API_BASENAME}/api`,
+		baseOptions: {
+			withCredentials: true,
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		},
+	}) as InstanceType<T>;
 }

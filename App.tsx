@@ -26,6 +26,7 @@ import { spotifyTokenAtom } from "./src/utils/atoms/tokenAtoms";
 import Top10Artists from "./src/pages/Profile/Pages/top10artists/Top10Artists";
 import Top10Songs from "./src/pages/Profile/Pages/top10Songs/Top10Songs";
 import Top5Playlists from "./src/pages/Profile/Pages/top5Playlists/Top5Playlist";
+import FriendProfile from "./src/pages/FriendProfile/FriendProfile";
 
 LogBox.ignoreAllLogs();
 
@@ -84,6 +85,15 @@ export default function App() {
 												options={{
 													header: () => null,
 												}}
+											/>
+											<Stack.Screen
+												name="FriendProfile"
+												options={{
+													title: "Profile",
+													// header: () => null,
+												}}
+												//@ts-expect-error
+												component={FriendProfile}
 											/>
 											<Stack.Screen
 												name="CreatePost"

@@ -10,7 +10,9 @@ import FavouritesImage from "./FavouritesImage";
 
 interface favouritesButtonProps {
 	text: string;
-	path: string;
+	path?: string;
+	onPress?: () => void;
+	data: string[];
 	variant: "artists" | "songs";
 }
 //functional component of react
@@ -18,21 +20,17 @@ const FavouritesButton: React.FC<favouritesButtonProps> = ({
 	text,
 	path,
 	variant,
+	onPress,
+	data,
 }) => {
 	const theme = useTheme();
 	const usersApi = useApi(UsersApi);
-	const { data } = useQuery({
-		queryKey: ["profile"],
-		queryFn: () => {
-			return usersApi.queryUserRouterGetUser();
-		},
-	});
 
 	const navigation = useNavigation();
 	return (
 		<TouchableRipple
 			//@ts-ignore
-			onPress={() => navigation.navigate(path)}
+			onPress={onPress ?? (() => navigation.navigate(path))}
 			underlayColor={theme.colors.primary}
 		>
 			<View style={{ padding: 12 }}>
@@ -55,10 +53,7 @@ const FavouritesButton: React.FC<favouritesButtonProps> = ({
 					horizontal
 					style={{ flexDirection: "row", zIndex: 100 }}
 				>
-					{(variant === "artists"
-						? data?.data.top10Artists
-						: data?.data.top10Songs
-					)?.map((item) => {
+					{data?.map((item) => {
 						return (
 							<FavouritesImage
 								key={item}

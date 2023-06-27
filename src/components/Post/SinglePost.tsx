@@ -18,19 +18,21 @@ import { fontVariant } from "../../utils/fonts/fontVariant";
 import { spotifyApi } from "../../utils/spotifyClients";
 import { getRecommendPostsQueryKey } from "./Hooks/useGetRecommendedPosts";
 import { audioAtom } from "./atoms/audioAtom";
+import { useNavigation } from "@react-navigation/native";
+import { useUser } from "../../hooks/useMe";
 
-
-// Il player funziona che quando premi play se non hai mai premuto play allora crea un istanza 
-// della classe Audio passandogli l'url della traccia. Una volta creata l'istanza fa play. 
-// Quando invece fai play su un altra canzone, invece di ricreare l'audio, semplicemente gli 
+// Il player funziona che quando premi play se non hai mai premuto play allora crea un istanza
+// della classe Audio passandogli l'url della traccia. Una volta creata l'istanza fa play.
+// Quando invece fai play su un altra canzone, invece di ricreare l'audio, semplicemente gli
 // carica un altra traccia dato l'url
-
 
 export default function SinglePost({
 	post,
 }: {
 	post: QueryPostsRouterGetRecommendedPost200ResponseInner;
 }) {
+	const { data: me, isLoading: isLoadingMe } = useUser();
+	const navigation = useNavigation();
 	const theme = useTheme();
 	const [audio, setAudio] = useAtom(audioAtom);
 
@@ -48,7 +50,7 @@ export default function SinglePost({
 		},
 	});
 
-	const isLoading = isLoadingTrack || isLoadingCreator;
+	const isLoading = isLoadingTrack || isLoadingCreator || isLoadingMe;
 
 	if (isLoading) {
 		return (
@@ -60,23 +62,39 @@ export default function SinglePost({
 
 	return (
 		<Card style={{ marginTop: 12, padding: 8 }}>
-			<View style={{ alignItems: "center", flexDirection: "row" }}>
-				<Avatar.Image
-					size={36}
-					style={{ marginRight: 12 }}
-					source={{
-						uri: creator?.body.images?.[0]?.url ?? "",
-					}}
-				/>
-
-				<Text
-					style={{
-						fontFamily: fontVariant.bold,
-					}}
-				>
-					{creator?.body.display_name ?? "Unknown"}
-				</Text>
-			</View>
+			<TouchableRipple
+				onPress={() => {
+					post.createdById === me?.data.id
+						? //@ts-expect-error
+						  navigation.navigate("Profile")
+						: //@ts-expect-error
+						  navigation.navigate("FriendProfile", {
+								userId: post.createdById,
+						  });
+				}}
+				style={{
+					padding: 8,
+					borderRadius: 8,
+				}}
+				underlayColor={theme.colors.primary}
+			>
+				<View style={{ alignItems: "center", flexDirection: "row" }}>
+					<Avatar.Image
+						size={36}
+						style={{ marginRight: 12 }}
+						source={{
+							uri: creator?.body.images?.[0]?.url ?? "",
+						}}
+					/>
+					<Text
+						style={{
+							fontFamily: fontVariant.bold,
+						}}
+					>
+						{creator?.body.display_name ?? "Unknown"}
+					</Text>
+				</View>
+			</TouchableRipple>
 			<Text style={{ marginTop: 12 }}>{post.caption}</Text>
 			<View
 				style={{
@@ -184,7 +202,7 @@ export default function SinglePost({
 									isPlaying: true,
 								}));
 							} else {
-								//PAUSE 
+								//PAUSE
 								if (audio.isPlaying) {
 									audio?.audio.sound.pauseAsync();
 									setAudio((prev) => ({

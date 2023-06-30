@@ -20,7 +20,8 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mussida.app"
+      "bundleIdentifier": "com.mussida.app",
+      "buildNumber": "1.0.1"
     },
     "android": {
       "adaptiveIcon": {

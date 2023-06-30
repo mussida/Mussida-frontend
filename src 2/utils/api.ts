@@ -3,7 +3,7 @@ import { useAtomValue } from "jotai";
 import "react-native-url-polyfill/auto";
 import { backendTokenAtom } from "./atoms/tokenAtoms";
 const BACKEND_API_BASENAME = "https://backendmussida-fwaxwt562a-oc.a.run.app";
-// const BACKEND_API_BASENAME = "http://192.168.8.105:8080";
+//const BACKEND_API_BASENAME = "http://192.168.8.105:8080";
 
 export function useApi<T>(apiConstructor: T) {
 	const backendToken = useAtomValue(backendTokenAtom);

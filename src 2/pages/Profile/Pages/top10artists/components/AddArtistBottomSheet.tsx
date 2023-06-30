@@ -24,7 +24,6 @@ import useTop10Artists, {
 	Top10ArtistRes,
 	top10ArtistQueryKey,
 } from "../Hooks/useTop10Artits";
-import { getRecommendPostsQueryKey } from "../../../../../components/Post/Hooks/useGetRecommendedPosts";
 const AddArtistBottomSheet = forwardRef<BottomSheetMethods, {}>(
 	(props, ref) => {
 		const { data: top10Artists } = useTop10Artists();
@@ -53,12 +52,10 @@ const AddArtistBottomSheet = forwardRef<BottomSheetMethods, {}>(
 			},
 			//rifetchamo cosi se error ci toglie elemento dalla lista
 			onSettled: () => {
+				queryClient.invalidateQueries(top10ArtistQueryKey);
 				queryClient.invalidateQueries(["profile"]);
-				queryClient.invalidateQueries(["user", "profile"]);
-				queryClient.invalidateQueries(getRecommendPostsQueryKey);
 			},
 			onError: (error) => {
-				queryClient.invalidateQueries(top10ArtistQueryKey);
 				Toast.show({
 					type: "error",
 					text1: "Operation failed",

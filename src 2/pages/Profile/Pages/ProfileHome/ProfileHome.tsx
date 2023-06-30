@@ -1,18 +1,32 @@
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useMe } from "../../../../hooks/useMe";
+import { Image, ImageStore, View } from "react-native";
+import { useCallback, useMemo, useRef, useState } from "react";
+import {
+	Button,
+	Text,
+	TouchableRipple,
+	useTheme,
+	Snackbar,
+} from "react-native-paper";
+import { fontVariant } from "../../../../utils/fonts/fontVariant";
+import {
+	parseMutationArgs,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { spotifyApi } from "../../../../utils/spotifyClients";
+import { useFavoutiteGenres } from "./queries/useFavouriteGenres";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useRef, useState } from "react";
-import { Image, View } from "react-native";
-import { Button, Text, TouchableRipple, useTheme } from "react-native-paper";
+import { genres } from "../../../../utils/constants/genres";
+import { AntDesign } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useApi } from "../../../../utils/api";
 import { UsersApi } from "spotifyApp-api-main-manager/dist/api";
 import LoadingModal from "../../../../components/Loadings/LoadingModal/LoadingModal";
-import LoadingScreen from "../../../../components/Loadings/LoadingScreen/LoadingScreen";
-import { useMe } from "../../../../hooks/useMe";
-import { useApi } from "../../../../utils/api";
-import { genres } from "../../../../utils/constants/genres";
-import { fontVariant } from "../../../../utils/fonts/fontVariant";
 import FavouritesButton from "./components/FavouritesButton";
-import { useFavoutiteGenres } from "./queries/useFavouriteGenres";
+import LoadingScreen from "../../../../components/Loadings/LoadingScreen/LoadingScreen";
 
 export default function ProfileHome() {
 	const { data: me, isLoading: loadingProfile } = useMe();
@@ -29,7 +43,7 @@ export default function ProfileHome() {
 	const queryClient = useQueryClient();
 	// ref
 	const bottomSheetRef = useRef<BottomSheet>(null);
-	const { mutate, isLoading } = useMutation({
+	const { mutate, isLoading, isError } = useMutation({
 		mutationFn: (params: { genre: string }) => {
 			const copiedFavouriteGenres = [...(userGenres?.data ?? [])];
 			if (selectedGenre) {
@@ -52,6 +66,11 @@ export default function ProfileHome() {
 	// variables
 	const snapPoints = useMemo(() => ["75%"], []);
 
+	// callbacks
+	const handleSheetChanges = useCallback((index: number) => {
+		console.log("handleSheetChanges", index);
+	}, []);
+
 	if (loadingProfile || isLoadingUser) return <LoadingScreen />;
 	return (
 		<View style={{ height: "100%" }}>
@@ -65,26 +84,15 @@ export default function ProfileHome() {
 					overflow: "hidden",
 				}}
 			>
-				{me?.body.images?.[0].url ? (
-					<Image
-						source={{ uri: me?.body.images?.[0].url }}
-						style={{
-							width: "100%",
-							height: "100%",
-							position: "absolute",
-						}}
-						resizeMode="cover"
-					/>
-				) : (
-					<View
-						style={{
-							width: "100%",
-							height: "100%",
-							position: "absolute",
-							backgroundColor: theme.colors.primary,
-						}}
-					/>
-				)}
+				<Image
+					source={{ uri: me?.body.images?.[0].url }}
+					style={{
+						width: "100%",
+						height: "100%",
+						position: "absolute",
+					}}
+					resizeMode="cover"
+				/>
 				<View
 					style={{
 						width: "100%",
@@ -210,6 +218,9 @@ export default function ProfileHome() {
 					})}
 				</BottomSheetScrollView>
 			</BottomSheet>
+			<Snackbar visible={isError} onDismiss={() => {}} duration={3000}>
+				Hey there! I'm a Snackbar.
+			</Snackbar>
 			<LoadingModal visible={isLoading} />
 		</View>
 	);

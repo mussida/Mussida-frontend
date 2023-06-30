@@ -1,20 +1,22 @@
-import {
-	AntDesign,
-	Ionicons,
-	MaterialCommunityIcons,
-} from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { useQueryClient } from "@tanstack/react-query";
-import * as React from "react";
 import { Platform, View } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
-import { FAB } from "react-native-paper";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import LoadingScreen from "../../components/Loadings/LoadingScreen/LoadingScreen";
+import * as React from "react";
+import {
+	SafeAreaView,
+	useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import { FAB, Portal } from "react-native-paper";
+import { AntDesign } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import useGetRecommendedPosts, {
 	getRecommendPostsQueryKey,
 } from "../../components/Post/Hooks/useGetRecommendedPosts";
+import LoadingScreen from "../../components/Loadings/LoadingScreen/LoadingScreen";
 import SinglePost from "../../components/Post/SinglePost";
+import { FlatList } from "react-native-gesture-handler";
+import { useQueryClient } from "@tanstack/react-query";
 import { useExpoNotification } from "../../hooks/useRegisterForNotifications";
 
 export default function Home() {
@@ -34,7 +36,7 @@ export default function Home() {
 		<View
 			style={{
 				height: "100%",
-				position: "relative",
+				position: "relative", 
 			}}
 		>
 			<FlatList

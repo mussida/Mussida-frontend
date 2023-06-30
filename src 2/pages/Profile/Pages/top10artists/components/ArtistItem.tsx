@@ -9,7 +9,6 @@ import useTop10Artists, {
 	Top10ArtistRes,
 	top10ArtistQueryKey,
 } from "../Hooks/useTop10Artits";
-import { getRecommendPostsQueryKey } from "../../../../../components/Post/Hooks/useGetRecommendedPosts";
 
 export default function ArtistItem({ artistId }: { artistId: string }) {
 	const { data, isLoading } = useSingleArtist(artistId);
@@ -37,8 +36,6 @@ export default function ArtistItem({ artistId }: { artistId: string }) {
 					};
 				}
 			);
-			queryClient.invalidateQueries(getRecommendPostsQueryKey);
-			queryClient.invalidateQueries(["user", "profile"]);
 		},
 	});
 

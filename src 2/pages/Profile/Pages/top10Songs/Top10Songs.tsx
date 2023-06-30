@@ -4,7 +4,6 @@ import TopNList from "../../../../components/TopNList/TopNList";
 import { useApi } from "../../../../utils/api";
 import { Response } from "../../../../utils/interfaces/Response";
 import { spotifyApi } from "../../../../utils/spotifyClients";
-import { getRecommendPostsQueryKey } from "../../../../components/Post/Hooks/useGetRecommendedPosts";
 
 export default function Top10Songs() {
 	const queryClient = useQueryClient();
@@ -67,8 +66,6 @@ export default function Top10Songs() {
 						};
 					}
 				);
-				queryClient.invalidateQueries(["user", "profile"]);
-				queryClient.invalidateQueries(getRecommendPostsQueryKey);
 			}}
 			//fa la ricerca da spotify mentre scrivo
 			searchEntity={function (
@@ -103,8 +100,6 @@ export default function Top10Songs() {
 			revalidateItems={function (): void {
 				queryClient.invalidateQueries(["profile", "top10Songs"]);
 				queryClient.invalidateQueries(["profile"]);
-				queryClient.invalidateQueries(["user", "profile"]);
-				queryClient.invalidateQueries(getRecommendPostsQueryKey);
 			}}
 		/>
 	);

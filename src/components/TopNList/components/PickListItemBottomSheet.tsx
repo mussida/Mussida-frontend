@@ -21,6 +21,7 @@ import Toast from "react-native-toast-message";
 import { useForwardedRef } from "../../../hooks/useForwardedRef";
 import { fontVariant } from "../../../utils/fonts/fontVariant";
 import { Response } from "../../../utils/interfaces/Response";
+import AvatarWithFallback from "../../AvatarWithFallback";
 
 type Props = {
 	selectedItems: string[];
@@ -147,17 +148,15 @@ const PickListItemBottomSheet = forwardRef<BottomSheetModalMethods, Props>(
 								>
 									<View
 										style={{
-											padding: 12,  
+											padding: 12,
 											flexDirection: "row",
 											alignItems: "center",
 										}}
 									>
-										<Avatar.Image
+										<AvatarWithFallback
 											size={40}
 											style={{ marginRight: 12 }}
-											source={{
-												uri: item.images[0]?.url ?? "",
-											}}
+											uri={item.images[0]?.url ?? ""}
 										/>
 										<Text variant="titleMedium">
 											{item.name}

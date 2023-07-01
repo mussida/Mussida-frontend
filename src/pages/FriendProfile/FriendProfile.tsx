@@ -15,6 +15,7 @@ import { useIsFollowing, useToggleFollowUser } from "./hooks/useIsFollowing";
 import TopNItemsBottomSheet from "./components/TopNItemsBottomSheet";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useRef } from "react";
+import AvatarWithFallback from "../../components/AvatarWithFallback";
 
 const FriendProfile = ({
 	route,
@@ -91,14 +92,10 @@ const FriendProfile = ({
 				ListHeaderComponent={
 					<>
 						<View style={{ padding: 12, alignItems: "center" }}>
-							<Avatar.Image
+							<AvatarWithFallback
 								size={64}
 								style={{ marginBottom: 12 }}
-								source={{
-									uri:
-										spotifyUser?.body.images?.[0]?.url ??
-										"",
-								}}
+								uri={spotifyUser?.body.images?.[0]?.url ?? ""}
 							/>
 							<Text
 								variant="bodyLarge"

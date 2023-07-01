@@ -20,17 +20,17 @@ export default function Login() {
 			}}
 		>
 			<Image
-				style={{ height: 80, resizeMode: "contain" }}
+				style={{ height: 120, resizeMode: "contain", marginTop: 100 }}
 				source={require("./assets/logoColoredTransparent.png")}
 			/>
-			<Text
+			{/* <Text
 				children="Mussida"
 				variant="displayLarge"
 				style={{
 					paddingTop: 8,
 					fontFamily: fontVariant.bold,
 				}}
-			/>
+			/> */}
 			<Text
 				style={{ textAlign: "center" }}
 				children="Share your music taste with your friends"
@@ -60,7 +60,7 @@ export default function Login() {
 					}}
 				/>
 			</View>
-			<Image
+			{/* <Image
 				style={{
 					position: "absolute",
 					left: "50%",
@@ -68,7 +68,7 @@ export default function Login() {
 					zIndex: -1,
 				}}
 				source={require("./assets/guitarMan.png")}
-			/>
+			/> */}
 		</SafeAreaView>
 	);
 }

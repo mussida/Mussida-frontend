@@ -22,6 +22,7 @@ import { spotifyApi } from "../../utils/spotifyClients";
 import { getRecommendPostsQueryKey } from "./Hooks/useGetRecommendedPosts";
 import { audioAtom } from "./atoms/audioAtom";
 import PostComments from "./components/PostComments";
+import AvatarWithFallback from "../AvatarWithFallback";
 
 // Il player funziona che quando premi play se non hai mai premuto play allora crea un istanza
 // della classe Audio passandogli l'url della traccia. Una volta creata l'istanza fa play.
@@ -57,11 +58,7 @@ export default function SinglePost({
 	const isLoading = isLoadingTrack || isLoadingCreator || isLoadingMe;
 
 	if (isLoading) {
-		return (
-			<View>
-				<Text>Loading...</Text>
-			</View>
-		);
+		return null;
 	}
 
 	return (
@@ -86,12 +83,10 @@ export default function SinglePost({
 					<View
 						style={{ alignItems: "center", flexDirection: "row" }}
 					>
-						<Avatar.Image
+						<AvatarWithFallback
 							size={36}
 							style={{ marginRight: 12 }}
-							source={{
-								uri: creator?.body.images?.[0]?.url ?? "",
-							}}
+							uri={creator?.body.images?.[0]?.url ?? ""}
 						/>
 						<Text
 							style={{

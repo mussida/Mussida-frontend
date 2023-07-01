@@ -2,7 +2,7 @@ import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
-import { Image, View } from "react-native";
+import { FlatList, Image, View } from "react-native";
 import { Button, Text, TouchableRipple, useTheme } from "react-native-paper";
 import { UsersApi } from "spotifyApp-api-main-manager/dist/api";
 import LoadingModal from "../../../../components/Loadings/LoadingModal/LoadingModal";
@@ -13,9 +13,14 @@ import { genres } from "../../../../utils/constants/genres";
 import { fontVariant } from "../../../../utils/fonts/fontVariant";
 import FavouritesButton from "./components/FavouritesButton";
 import { useFavoutiteGenres } from "./queries/useFavouriteGenres";
+import SinglePost from "../../../../components/Post/SinglePost";
+import { PostsApi } from "spotifyApp-api-main-manager/dist/api";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+import { useSafeAreaFrame } from "react-native-safe-area-context";
 
 export default function ProfileHome() {
 	const { data: me, isLoading: loadingProfile } = useMe();
+	const { height } = useSafeAreaFrame();
 	const { data: user, isLoading: isLoadingUser } = useQuery({
 		queryKey: ["user", "profile"],
 		queryFn: () => {
@@ -52,111 +57,147 @@ export default function ProfileHome() {
 	// variables
 	const snapPoints = useMemo(() => ["75%"], []);
 
+	const postsApi = useApi(PostsApi);
+
+	const { data: posts, isLoading: isLoadingPosts } = useQuery({
+		queryKey: ["user", user?.data.id, "posts"],
+		queryFn: () => {
+			return postsApi.queryPostsRouterGetUserPosts(user?.data.id ?? "");
+		},
+		onError: () => {
+			Toast.show({
+				text1: "Error",
+				text2: "Cannot load user's posts",
+				type: "error",
+			});
+		},
+		enabled: Boolean(user?.data.id),
+	});
+
 	if (loadingProfile || isLoadingUser) return <LoadingScreen />;
 	return (
 		<View style={{ height: "100%" }}>
-			<View
-				style={{
-					position: "relative",
-					height: "35%",
-					justifyContent: "flex-end",
-					borderBottomEndRadius: 12,
-					borderBottomStartRadius: 12,
-					overflow: "hidden",
-				}}
-			>
-				{me?.body.images?.[0].url ? (
-					<Image
-						source={{ uri: me?.body.images?.[0].url }}
-						style={{
-							width: "100%",
-							height: "100%",
-							position: "absolute",
-						}}
-						resizeMode="cover"
-					/>
-				) : (
-					<View
-						style={{
-							width: "100%",
-							height: "100%",
-							position: "absolute",
-							backgroundColor: theme.colors.primary,
-						}}
-					/>
-				)}
-				<View
-					style={{
-						width: "100%",
-						height: "100%",
-						position: "absolute",
-						backgroundColor:
-							"linear-gradient(0.38deg, rgba(0, 0, 0, 0.24) 0.34%, rgba(255, 255, 255, 0) 56.87%)",
-					}}
-				></View>
-				<Text
-					variant="headlineMedium"
-					style={{ fontFamily: fontVariant.bold, padding: 8 }}
-				>
-					{me?.body.display_name}
-				</Text>
-			</View>
-			<View
-				style={{
-					flexDirection: "row",
-					padding: 16,
-					justifyContent: "space-around",
-				}}
-			>
-				{userGenres?.data.map((genre, index) => {
-					return (
-						<Button
-							onPress={() => {
-								bottomSheetRef.current?.expand();
-								setSelectedGenre(genre);
+			<FlatList
+				// contentContainerStyle={{ paddingBottom: bottom }}
+				ListHeaderComponent={
+					<>
+						<View
+							style={{
+								position: "relative",
+								height: height * 0.3,
+								justifyContent: "flex-end",
+								borderBottomEndRadius: 12,
+								borderBottomStartRadius: 12,
+								overflow: "hidden",
 							}}
-							mode="contained"
-							style={{}}
-							key={genre + "_" + index}
 						>
-							{genre}
-						</Button>
-					);
-				})}
-				{[...new Array(3 - (userGenres?.data.length ?? 0))].map(
-					(_, index) => {
-						return (
-							<Button
-								onPress={() => {
-									bottomSheetRef.current?.expand();
-									setSelectedGenre(undefined);
-								}}
-								mode="contained"
-								style={{}}
-								key={"_" + index}
-							>
-								<MaterialIcons
-									name="add"
-									size={20}
-									color={"black"}
+							{me?.body.images?.[0]?.url ? (
+								<Image
+									source={{ uri: me?.body.images?.[0]?.url }}
+									style={{
+										width: "100%",
+										height: "100%",
+										position: "absolute",
+									}}
+									resizeMode="cover"
 								/>
-							</Button>
-						);
-					}
-				)}
-			</View>
-			<FavouritesButton
-				text="Top 10 artists"
-				path="Top10Artists"
-				variant="artists"
-				data={user?.data.top10Artists ?? []}
-			></FavouritesButton>
-			<FavouritesButton
-				text="Top 10 songs"
-				path="Top10Songs"
-				variant="songs"
-				data={user?.data.top10Songs ?? []}
-			></FavouritesButton>
+							) : (
+								<View
+									style={{
+										width: "100%",
+										height: "100%",
+										position: "absolute",
+										backgroundColor: theme.colors.primary,
+									}}
+								/>
+							)}
+							<View
+								style={{
+									width: "100%",
+									height: "100%",
+									position: "absolute",
+									backgroundColor:
+										"linear-gradient(0.38deg, rgba(0, 0, 0, 0.24) 0.34%, rgba(255, 255, 255, 0) 56.87%)",
+								}}
+							></View>
+							<Text
+								variant="headlineMedium"
+								style={{
+									fontFamily: fontVariant.bold,
+									padding: 8,
+								}}
+							>
+								{me?.body.display_name}
+							</Text>
+						</View>
+						<View
+							style={{
+								flexDirection: "row",
+								padding: 16,
+								justifyContent: "space-around",
+							}}
+						>
+							{userGenres?.data.map((genre, index) => {
+								return (
+									<Button
+										onPress={() => {
+											bottomSheetRef.current?.expand();
+											setSelectedGenre(genre);
+										}}
+										mode="contained"
+										style={{}}
+										key={genre + "_" + index}
+									>
+										{genre}
+									</Button>
+								);
+							})}
+							{[
+								...new Array(
+									3 - (userGenres?.data.length ?? 0)
+								),
+							].map((_, index) => {
+								return (
+									<Button
+										onPress={() => {
+											bottomSheetRef.current?.expand();
+											setSelectedGenre(undefined);
+										}}
+										mode="contained"
+										style={{}}
+										key={"_" + index}
+									>
+										<MaterialIcons
+											name="add"
+											size={20}
+											color={"black"}
+										/>
+									</Button>
+								);
+							})}
+						</View>
+						<FavouritesButton
+							text="Top 10 artists"
+							path="Top10Artists"
+							variant="artists"
+							data={user?.data.top10Artists ?? []}
+						></FavouritesButton>
+						<FavouritesButton
+							text="Top 10 songs"
+							path="Top10Songs"
+							variant="songs"
+							data={user?.data.top10Songs ?? []}
+						></FavouritesButton>
+					</>
+				}
+				ListEmptyComponent={() => {
+					return <Text>Loading posts</Text>;
+				}}
+				renderItem={(item) => {
+					return <SinglePost post={item.item} />;
+				}}
+				data={posts?.data ?? []}
+			></FlatList>
 			{/* <FavouritesButton
         text="Top 5 playlists"
         path="Top5Playlists"

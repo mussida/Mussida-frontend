@@ -2,6 +2,7 @@ import { UsersApi } from "spotifyApp-api-main-manager/dist/api";
 import { useApi } from "../../../utils/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
+import { getRecommendPostsQueryKey } from "../../../components/Post/Hooks/useGetRecommendedPosts";
 
 export function useIsFollowing(userId: string) {
 	const usersApi = useApi(UsersApi);
@@ -37,6 +38,7 @@ export function useToggleFollowUser({
 		onSuccess: () => {
 			queryClient.setQueryData(["isFollowing", userId], !isFollowing);
 			queryClient.invalidateQueries(["isFollowing", userId]);
+			queryClient.invalidateQueries(getRecommendPostsQueryKey);
 		},
 		onError: () => {
 			Toast.show({

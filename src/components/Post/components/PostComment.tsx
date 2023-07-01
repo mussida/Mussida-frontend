@@ -7,6 +7,7 @@ import { QueryPostsRouterGetRecommendedPost200ResponseInner } from "spotifyApp-a
 import { useUser } from "../../../hooks/useMe";
 import { fontVariant } from "../../../utils/fonts/fontVariant";
 import { spotifyApi } from "../../../utils/spotifyClients";
+import AvatarWithFallback from "../../AvatarWithFallback";
 
 type PostCommentProps = {
 	comment: QueryPostsRouterGetRecommendedPost200ResponseInner["comments"][number];
@@ -37,18 +38,16 @@ const PostComment: React.FC<PostCommentProps> = ({
 	};
 
 	return (
-		<View style={{ flexDirection: "row" }}>
+		<View style={{ flexDirection: "row", marginBottom: 8 }}>
 			{isLoadingUser ? (
 				<Text>Loading...</Text>
 			) : (
 				<>
 					<TouchableWithoutFeedback onPress={onTapUser}>
-						<Avatar.Image
+						<AvatarWithFallback
 							size={36}
 							style={{ marginRight: 12, marginTop: 4 }}
-							source={{
-								uri: user?.body.images?.[0]?.url ?? "",
-							}}
+							uri={user?.body.images?.[0]?.url ?? ""}
 						/>
 					</TouchableWithoutFeedback>
 					<View>

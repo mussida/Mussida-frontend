@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import { useAtom } from "jotai";
 import React, { useRef } from "react";
-import { Image, Platform, View } from "react-native";
+import { Image, Linking, Platform, Pressable, View } from "react-native";
 import {
 	ActivityIndicator,
 	Avatar,
@@ -143,6 +143,34 @@ export default function SinglePost({
 							uri: track?.body.album.images[0]?.url ?? "",
 						}}
 					/>
+					<Pressable
+						onPress={() => {
+							if (track?.body.external_urls.spotify)
+								Linking.openURL(
+									track?.body.external_urls.spotify
+								);
+						}}
+						style={{
+							position: "absolute",
+							right: 8,
+							top: 8,
+							width: "20%",
+							height: "10%",
+						}}
+					>
+						<Image
+							style={{
+								shadowColor: "#171717",
+								shadowOffset: { width: 0, height: 4 },
+								shadowOpacity: 0.2,
+								shadowRadius: 3,
+								width: "100%",
+								height: "100%",
+								resizeMode: "contain",
+							}}
+							source={require("../../../assets/spotify_logo.png")}
+						/>
+					</Pressable>
 					<TouchableRipple
 						onPress={async () => {
 							//STARTING FIRST PLAYER

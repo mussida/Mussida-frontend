@@ -1,12 +1,12 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { View } from "react-native";
+import { Linking, Pressable, View } from "react-native";
 import { Avatar, IconButton, Text } from "react-native-paper";
 import { useConfirmationDialog } from "../../GlobalConfirmationDialog/hooks/useConfirmationDialog";
 import { singleTopNListItemQueryKey } from "../query/topNListItemQueryKeyFactory";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 type TopNListItemProps<
-	T extends { images: SpotifyApi.ImageObject[]; name: string }
+	T extends { images: SpotifyApi.ImageObject[]; name: string; url?: string }
 > = {
 	itemId: string;
 	entityName: string;
@@ -15,7 +15,7 @@ type TopNListItemProps<
 	onDeleteSuccess: (id: string) => void;
 };
 const TopNListItem = <
-	T extends { images: SpotifyApi.ImageObject[]; name: string }
+	T extends { images: SpotifyApi.ImageObject[]; name: string; url?: string }
 >({
 	itemId,
 	entityName,
@@ -50,48 +50,54 @@ const TopNListItem = <
 		<Text>Loading...</Text>
 	) : (
 		<>
-			<View
-				style={{
-					display: "flex",
-					flexDirection: "row",
-					alignItems: "center",
-					padding: 12,
+			<Pressable
+				onPress={() => {
+					if (data?.url) Linking.openURL(data?.url);
 				}}
 			>
-				<Avatar.Image
-					size={40}
-					style={{ marginRight: 12 }}
-					source={{ uri: data?.images[0]?.url ?? "" }}
-				/>
-				<Text
-					variant="titleMedium"
-					style={{ flexGrow: 1, flexShrink: 1 }}
+				<View
+					style={{
+						display: "flex",
+						flexDirection: "row",
+						alignItems: "center",
+						padding: 12,
+					}}
 				>
-					{data?.name}
-				</Text>
-				<IconButton
-					icon={"delete"}
-					onPress={() =>
-						showConfirmationDialog({
-							title: `Delete ${entityName}`,
-							description: `Are you sure you want to delete ${entityName}?`,
-							negativeButton: {
-								text: "Cancel",
-								onPress: () => {},
-							},
-							positiveButton: {
-								text: "Delete",
-								onPress: () => {
-									return deleteArtist
-										.mutateAsync()
-										.catch((e) => {});
+					<Avatar.Image
+						size={40}
+						style={{ marginRight: 12 }}
+						source={{ uri: data?.images[0]?.url ?? "" }}
+					/>
+					<Text
+						variant="titleMedium"
+						style={{ flexGrow: 1, flexShrink: 1 }}
+					>
+						{data?.name}
+					</Text>
+					<IconButton
+						icon={"delete"}
+						onPress={() =>
+							showConfirmationDialog({
+								title: `Delete ${entityName}`,
+								description: `Are you sure you want to delete ${entityName}?`,
+								negativeButton: {
+									text: "Cancel",
+									onPress: () => {},
 								},
-							},
-						})
-					}
-					style={{}}
-				></IconButton>
-			</View>
+								positiveButton: {
+									text: "Delete",
+									onPress: () => {
+										return deleteArtist
+											.mutateAsync()
+											.catch((e) => {});
+									},
+								},
+							})
+						}
+						style={{}}
+					></IconButton>
+				</View>
+			</Pressable>
 		</>
 	);
 };

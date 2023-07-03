@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { View } from "react-native";
+import { Linking, Pressable, View } from "react-native";
 import { Avatar, IconButton, Text } from "react-native-paper";
 import { UsersApi } from "spotifyApp-api-main-manager/dist/api";
 import { useConfirmationDialog } from "../../../../../components/GlobalConfirmationDialog/hooks/useConfirmationDialog";
@@ -48,49 +48,56 @@ export default function ArtistItem({ artistId }: { artistId: string }) {
 		<Text>Loading...</Text>
 	) : (
 		<>
-			<View
-				style={{
-					display: "flex",
-					flexDirection: "row",
-					alignItems: "center",
-					padding: 12,
+			<Pressable
+				onPress={() => {
+					if (data?.body.external_urls.spotify)
+						Linking.openURL(data?.body.external_urls.spotify ?? "");
 				}}
 			>
-				<Avatar.Image
-					size={40}
-					style={{ marginRight: 12 }}
-					source={{ uri: data?.body.images[0]?.url ?? "" }}
-				/>
-				<Text
-					variant="titleMedium"
-					style={{ flexGrow: 1, flexShrink: 1 }}
+				<View
+					style={{
+						display: "flex",
+						flexDirection: "row",
+						alignItems: "center",
+						padding: 12,
+					}}
 				>
-					{data?.body.name}
-				</Text>
-				<IconButton
-					icon={"delete"}
-					onPress={() =>
-						showConfirmationDialog({
-							title: "Delete artist",
-							description:
-								"Are you sure you want to delete this artist?",
-							negativeButton: {
-								text: "Cancel",
-								onPress: () => {},
-							},
-							positiveButton: {
-								text: "Delete",
-								onPress: () => {
-									return deleteArtist
-										.mutateAsync()
-										.catch((e) => {});
+					<Avatar.Image
+						size={40}
+						style={{ marginRight: 12 }}
+						source={{ uri: data?.body.images[0]?.url ?? "" }}
+					/>
+					<Text
+						variant="titleMedium"
+						style={{ flexGrow: 1, flexShrink: 1 }}
+					>
+						{data?.body.name}
+					</Text>
+					<IconButton
+						icon={"delete"}
+						onPress={() =>
+							showConfirmationDialog({
+								title: "Delete artist",
+								description:
+									"Are you sure you want to delete this artist?",
+								negativeButton: {
+									text: "Cancel",
+									onPress: () => {},
 								},
-							},
-						})
-					}
-					style={{}}
-				></IconButton>
-			</View>
+								positiveButton: {
+									text: "Delete",
+									onPress: () => {
+										return deleteArtist
+											.mutateAsync()
+											.catch((e) => {});
+									},
+								},
+							})
+						}
+						style={{}}
+					></IconButton>
+				</View>
+			</Pressable>
 		</>
 	);
 }

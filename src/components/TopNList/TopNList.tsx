@@ -12,7 +12,7 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 
 type TopNListProps<
 	//la fetch deve restituire una cosa che come minimo deve avere queste proprietà
-	T extends { images: SpotifyApi.ImageObject[]; name: string }
+	T extends { images: SpotifyApi.ImageObject[]; name: string; url?: string }
 > = {
 	data: string[];
 	entityName: string;
@@ -43,7 +43,7 @@ type TopNListProps<
 };
 
 const TopNList = <
-	T extends { images: SpotifyApi.ImageObject[]; name: string }
+	T extends { images: SpotifyApi.ImageObject[]; name: string; url?: string }
 >({
 	data,
 	maxLenght,

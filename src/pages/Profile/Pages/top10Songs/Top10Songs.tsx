@@ -44,6 +44,7 @@ export default function Top10Songs() {
 					return {
 						images: res.body.album.images,
 						name: res.body.name,
+						url: res.body.external_urls.spotify,
 					};
 				});
 			}}

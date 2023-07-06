@@ -1,13 +1,19 @@
-import { TouchableWithoutFeedback } from "@gorhom/bottom-sheet";
+import { Feather } from "@expo/vector-icons";
+import {
+	BottomSheetModal,
+	TouchableWithoutFeedback,
+} from "@gorhom/bottom-sheet";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
+import { useRef } from "react";
 import { View } from "react-native";
-import { Avatar, Text } from "react-native-paper";
+import { IconButton, Text } from "react-native-paper";
 import { QueryPostsRouterGetRecommendedPost200ResponseInner } from "spotifyApp-api-main-manager";
 import { useUser } from "../../../hooks/useMe";
 import { fontVariant } from "../../../utils/fonts/fontVariant";
 import { spotifyApi } from "../../../utils/spotifyClients";
 import AvatarWithFallback from "../../AvatarWithFallback";
+import ReportMenu from "../../ReportMenu/ReportMenu";
 
 type PostCommentProps = {
 	comment: QueryPostsRouterGetRecommendedPost200ResponseInner["comments"][number];
@@ -36,6 +42,7 @@ const PostComment: React.FC<PostCommentProps> = ({
 					userId: comment.createdById,
 			  });
 	};
+	const reportBottomSheet = useRef<BottomSheetModal>(null);
 
 	return (
 		<View style={{ flexDirection: "row", marginBottom: 8 }}>
@@ -50,7 +57,11 @@ const PostComment: React.FC<PostCommentProps> = ({
 							uri={user?.body.images?.[0]?.url ?? ""}
 						/>
 					</TouchableWithoutFeedback>
-					<View>
+					<View
+						style={{
+							flex: 1,
+						}}
+					>
 						<TouchableWithoutFeedback onPress={onTapUser}>
 							<Text style={{ fontFamily: fontVariant.bold }}>
 								{user?.body.display_name ?? "Unknown"}
@@ -60,6 +71,26 @@ const PostComment: React.FC<PostCommentProps> = ({
 							{comment.text}
 						</Text>
 					</View>
+					<IconButton
+						onPress={() => {
+							// hideBottomSheet();
+							reportBottomSheet.current?.present();
+						}}
+						style={{
+							position: "absolute",
+							top: 0,
+							right: 0,
+						}}
+						size={20}
+						icon={(props) => {
+							return <Feather name="more-vertical" {...props} />;
+						}}
+					></IconButton>
+					<ReportMenu
+						ref={reportBottomSheet}
+						instanceId={comment.id}
+						instanceType="comment"
+					/>
 				</>
 			)}
 		</View>

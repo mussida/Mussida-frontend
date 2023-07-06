@@ -49,7 +49,8 @@
     "react-native-url-polyfill": "^1.3.0",
     "react-native-web": "~0.18.9",
     "spotify-web-api-node": "^5.0.2",
-    "spotifyApp-api-main-manager": "file:generated-sources/main"
+    "spotifyApp-api-main-manager": "file:generated-sources/main",
+    "@react-native-async-storage/async-storage": "~1.17.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

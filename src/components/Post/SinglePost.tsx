@@ -1,4 +1,4 @@
-import { FontAwesome5 } from "@expo/vector-icons";
+import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
@@ -8,9 +8,9 @@ import React, { useRef } from "react";
 import { Image, Linking, Platform, Pressable, View } from "react-native";
 import {
 	ActivityIndicator,
-	Avatar,
 	Card,
 	Chip,
+	IconButton,
 	Text,
 	TouchableRipple,
 	useTheme,
@@ -19,10 +19,11 @@ import { QueryPostsRouterGetRecommendedPost200ResponseInner } from "spotifyApp-a
 import { useUser } from "../../hooks/useMe";
 import { fontVariant } from "../../utils/fonts/fontVariant";
 import { spotifyApi } from "../../utils/spotifyClients";
+import AvatarWithFallback from "../AvatarWithFallback";
+import ReportMenu from "../ReportMenu/ReportMenu";
 import { getRecommendPostsQueryKey } from "./Hooks/useGetRecommendedPosts";
 import { audioAtom } from "./atoms/audioAtom";
 import PostComments from "./components/PostComments";
-import AvatarWithFallback from "../AvatarWithFallback";
 
 // Il player funziona che quando premi play se non hai mai premuto play allora crea un istanza
 // della classe Audio passandogli l'url della traccia. Una volta creata l'istanza fa play.
@@ -56,6 +57,7 @@ export default function SinglePost({
 	});
 
 	const isLoading = isLoadingTrack || isLoadingCreator || isLoadingMe;
+	const reportBottomSheet = useRef<BottomSheetModal>(null);
 
 	if (isLoading) {
 		return null;
@@ -91,10 +93,25 @@ export default function SinglePost({
 						<Text
 							style={{
 								fontFamily: fontVariant.bold,
+								flexGrow: 1,
 							}}
 						>
 							{creator?.body.display_name ?? "Unknown"}
 						</Text>
+						<IconButton
+							onPress={() => {
+								reportBottomSheet.current?.present();
+							}}
+							style={{
+								marginLeft: "auto",
+							}}
+							size={20}
+							icon={(props) => {
+								return (
+									<Feather name="more-vertical" {...props} />
+								);
+							}}
+						></IconButton>
 					</View>
 				</TouchableRipple>
 				<Text style={{ marginTop: 12 }}>{post.caption}</Text>
@@ -293,6 +310,11 @@ export default function SinglePost({
 				key={post.id}
 				post={post}
 				ref={commentsBottomSheetRef}
+			/>
+			<ReportMenu
+				ref={reportBottomSheet}
+				instanceId={post.id}
+				instanceType="post"
 			/>
 		</>
 	);

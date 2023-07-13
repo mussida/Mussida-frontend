@@ -16,6 +16,7 @@ import useGetRecommendedPosts, {
 } from "../../components/Post/Hooks/useGetRecommendedPosts";
 import SinglePost from "../../components/Post/SinglePost";
 import { useExpoNotification } from "../../hooks/useRegisterForNotifications";
+import { QueryPostsRouterGetRecommendedPost200ResponsePostsInner } from "spotifyApp-api-main-manager";
 
 export default function Home() {
 	const { bottom } = useSafeAreaInsets();
@@ -23,7 +24,25 @@ export default function Home() {
 	const queryClient = useQueryClient();
 	const navigation = useNavigation();
 	const [open, setOpen] = React.useState(false);
-	const { data, isLoading, isFetching } = useGetRecommendedPosts();
+	const { data, isLoading, isFetching, fetchNextPage, hasNextPage } =
+		useGetRecommendedPosts();
+
+	const posts = React.useMemo(() => {
+		return data?.pages.reduce((acc, curr) => {
+			return [...acc, ...curr.data.posts];
+		}, [] as QueryPostsRouterGetRecommendedPost200ResponsePostsInner[]);
+	}, [data]);
+
+	const renderItem = React.useCallback(
+		({
+			item,
+		}: {
+			item: QueryPostsRouterGetRecommendedPost200ResponsePostsInner;
+		}) => {
+			return <SinglePost post={item} />;
+		},
+		[]
+	);
 
 	useExpoNotification();
 
@@ -45,9 +64,12 @@ export default function Home() {
 					padding: 12,
 				}}
 				refreshing={isFetching}
-				data={data?.data}
-				renderItem={(item) => {
-					return <SinglePost post={item.item} />;
+				data={posts ?? []}
+				renderItem={renderItem}
+				onEndReached={() => {
+					if (hasNextPage) {
+						fetchNextPage();
+					}
 				}}
 			></FlatList>
 			<FAB.Group

@@ -74,6 +74,11 @@ export default function ProfileHome() {
 		enabled: Boolean(user?.data.id),
 	});
 
+	const profileImage = me?.body.images?.reduce((prev, curr) => {
+		if ((prev.height ?? 0) > (curr.height ?? 0)) return prev;
+		return curr;
+	}, me?.body.images?.[0]);
+
 	if (loadingProfile || isLoadingUser) return <LoadingScreen />;
 	return (
 		<View style={{ height: "100%" }}>
@@ -91,9 +96,9 @@ export default function ProfileHome() {
 								overflow: "hidden",
 							}}
 						>
-							{me?.body.images?.[0]?.url ? (
+							{profileImage?.url ? (
 								<Image
-									source={{ uri: me?.body.images?.[0]?.url }}
+									source={{ uri: profileImage.url }}
 									style={{
 										width: "100%",
 										height: "100%",
